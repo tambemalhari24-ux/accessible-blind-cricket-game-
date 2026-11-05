@@ -32,21 +32,22 @@ summary{font-weight:700}
 <h1 id="title"></h1>
 <p id="score"></p>
 <p id="status" role="status" aria-live="polite"></p>
-<button id="hit"></button>
+<div id="shots" hidden>
 <div class="row"><button class="shot" id="sL" data-s="-1"></button><button class="shot" id="sC" data-s="0"></button><button class="shot" id="sR" data-s="1"></button></div>
-<div class="row"><button id="prac"></button><button id="rep"></button><button id="rpt"></button></div>
-<div class="row"><button id="test"></button><button id="langb"></button></div>
-<div class="row"><button id="ovb"></button><button id="lvb"></button></div>
-<button id="btb"></button>
-<div class="row"><button id="onb"></button><button id="prb"></button></div>
-<details id="onp"><summary id="onpT"></summary><button id="mkr"></button>
-<label for="rcode" id="rcL"></label><input id="rcode" inputmode="numeric" maxlength="4" style="font:inherit;font-size:1.3rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8"><button id="jnr"></button></details>
-<details id="prof"><summary id="profT"></summary>
-<label for="nm" id="nmL"></label><input id="nm" type="text" maxlength="20" autocomplete="nickname" style="font:inherit;font-size:1.15rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8">
+<div class="row"><button id="rpt"></button><button id="rep"></button></div>
+</div>
+<details id="prof" open><summary id="profT"></summary>
+<label for="nm" id="nmL"></label><input id="nm" type="text" maxlength="20" autocomplete="nickname" style="font:inherit;font-size:1.2rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8">
 <p id="pst" role="region"></p><button id="gsb"></button></details>
+<details id="offp"><summary id="offT"></summary>
+<button id="hit"></button><button id="prac"></button><button id="ovb"></button><button id="lvb"></button></details>
+<details id="onp"><summary id="onpT"></summary><button id="mkr"></button>
+<label for="rcode" id="rcL"></label><input id="rcode" inputmode="numeric" maxlength="4" style="font:inherit;font-size:1.2rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8"><button id="jnr"></button></details>
+<details id="setp"><summary id="setT"></summary>
+<button id="langb"></button><button id="test"></button><button id="btb"></button>
 <label><input type="checkbox" id="vibc" checked><span id="vibl"></span></label>
-<label><input type="checkbox" id="tts"><span id="ttsl"></span></label>
-<details open><summary id="rulesT"></summary><div id="rulesB"></div></details>
+<label><input type="checkbox" id="tts"><span id="ttsl"></span></label></details>
+<details id="rul"><summary id="rulesT"></summary><div id="rulesB"></div></details>
 </main>
 <script>
 (function(){
@@ -99,6 +100,7 @@ yourBowl:'Your turn to bowl. Press Hit left, Hit straight or Hit right to choose
 swap:(s,t)=>`Innings over, ${s} runs. Roles swap now. Target ${t}.`,
 wonO:o=>`Match over. You beat ${o}! Congratulations!`,lostO:o=>`Match over. ${o} won this one. Try again!`,
 ok:{out:'Wicket!',six:'Six!',four:'Four!',runs:n=>n==1?'One run.':n+' runs.',dot:'Dot ball.'},
+offl:'Play vs computer',setl:'Settings',inS:'Signed in with Google.',outS:'Not signed in. Sign in once, and the game remembers you.',
 nbCall:'No ball!',nbSave:'But it was a no ball, so you are not out!',fh:'Free hit! You cannot be out.',fhSave:'That would have been out, but it is a free hit, so you survive!',},
 hi:{title:'ऑडियो क्रिकेट',hint:'शुरू करने के लिए बड़ा पीला बटन दबाएँ। गेंदबाज़ की दौड़ सुनिए, फिर गेंद। जिस कान से गेंद आए, उसी तरफ का बटन (बाएँ, सीधा, दाएँ) टप्पे के ठीक बाद दबाइए। बाएँ-दाएँ सुनने के लिए हेडफ़ोन लगाएँ।',
 start:'खेल शुरू करो',shot:'शॉट मारो',again:'फिर से खेलो',prac:'अभ्यास गेंद',rep:'स्कोर बताओ',test:'आवाज़ टेस्ट',lang:'Play in English',
@@ -148,6 +150,7 @@ yourBowl:'आपकी गेंदबाज़ी की बारी। ला
 swap:(s,t)=>`पारी खत्म, ${s} रन। अब भूमिकाएँ बदलेंगी। लक्ष्य ${t}।`,
 wonO:o=>`मैच खत्म। आपने ${o} को हरा दिया! बधाई!`,lostO:o=>`मैच खत्म। इस बार ${o} जीते। फिर कोशिश कीजिए!`,
 ok:{out:'विकेट!',six:'छक्का!',four:'चौका!',runs:n=>n==1?'एक रन।':n+' रन।',dot:'डॉट बॉल।'},
+offl:'कंप्यूटर के खिलाफ खेलो',setl:'सेटिंग',inS:'Google से साइन इन है।',outS:'साइन इन नहीं है। एक बार साइन इन कीजिए, गेम याद रखेगा।',
 nbCall:'नो बॉल!',nbSave:'लेकिन नो बॉल थी, इसलिए आप आउट नहीं हैं!',fh:'फ्री हिट! इस गेंद पर आउट नहीं होंगे।',fhSave:'यह आउट होता, पर फ्री हिट है, इसलिए बच गए!',}};
 let lg='en',ac,out,crowd,state='idle',ball=null,lastDown=0,tok=0,tts=false;
 const $=id=>document.getElementById(id),L=()=>S[lg],R=a=>a[Math.floor(Math.random()*a.length)];
@@ -174,7 +177,7 @@ const need=()=>L().need(G.target-G.runs,TB()-G.balls,MW()-G.wk);
 const scoreText=()=>G.started?L().sc(G.runs,G.wk,G.balls,G.target):L().none;
 function ui(){
   const l=L();$('score').textContent=scoreText();
-  $('hit').textContent=(G.started&&!G.over)?l.playing:(G.over?l.again:l.start);$('hit').disabled=G.started&&!G.over;$('sL').textContent=l.sL;$('sC').textContent=l.sC;$('sR').textContent=l.sR;$('vibl').textContent=l.vib;$('ovb').textContent=l.ovl(CFG.ov);$('lvb').textContent=l.lv+': '+l.lvn[CFG.lv];$('btb').textContent=l.bt+': '+l.btl[CFG.bt];$('rpt').textContent=l.rpt;$('mkr').textContent=l.mkr;$('jnr').textContent=l.jnr;$('rcL').textContent=l.rcL;$('onpT').textContent=l.onl;$('onb').textContent=l.onl;$('prb').textContent=l.prof;$('profT').textContent=l.prof;$('nmL').textContent=l.nmL;$('gsb').textContent=fbU?l.gout:l.gin;$('pst').textContent=l.pst(PROF);if(document.activeElement!==$('nm'))$('nm').value=PROF.name;
+  $('hit').textContent=(G.started&&!G.over)?l.playing:(G.over?l.again:l.start);$('hit').disabled=G.started&&!G.over;$('sL').textContent=l.sL;$('sC').textContent=l.sC;$('sR').textContent=l.sR;$('vibl').textContent=l.vib;$('ovb').textContent=l.ovl(CFG.ov);$('lvb').textContent=l.lv+': '+l.lvn[CFG.lv];$('btb').textContent=l.bt+': '+l.btl[CFG.bt];$('rpt').textContent=l.rpt;const inM=G.started&&!G.over;$('shots').hidden=!inM;['prof','offp','onp','setp','rul'].forEach(i=>{$(i).hidden=inM;});$('mkr').textContent=l.mkr;$('jnr').textContent=l.jnr;$('rcL').textContent=l.rcL;$('onpT').textContent=l.onl;$('offT').textContent=l.offl;$('setT').textContent=l.setl;$('profT').textContent=l.prof;$('nmL').textContent=l.nmL;$('gsb').textContent=fbU?l.gout:l.gin;$('pst').textContent=l.pst(PROF)+' '+(fbU?l.inS:l.outS);if(document.activeElement!==$('nm'))$('nm').value=PROF.name;
   $('title').textContent=l.title;$('prac').textContent=l.prac;$('rep').textContent=l.rep;$('test').textContent=l.test;
   $('langb').textContent=l.lang;$('ttsl').textContent=l.tts;$('rulesT').textContent=l.rulesT;
   $('rulesB').innerHTML=l.rules.map(p=>'<p>'+p+'</p>').join('');
@@ -192,9 +195,10 @@ function loadFB(cb){
 function signIn(){loadFB(()=>firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(r=>{
   fbU=r.user;try{localStorage.setItem('acs','1');}catch(e){}if(!PROF.name||PROF.name==='Player')PROF.name=fbU.displayName||PROF.name;
   ui();say(L().signed(PROF.name));
-  try{firebase.database().ref('users/'+fbU.uid).get().then(sn=>{const c=sn.val();if(c&&c.m>PROF.m){Object.assign(PROF,c);ui();}saveP();}).catch(()=>{});}catch(e){}
+  cloudMerge();
 }).catch(e=>say(L().fail+' '+(e.code||''))));}
 const db=()=>firebase.database();
+function cloudMerge(){try{firebase.database().ref('users/'+fbU.uid).get().then(sn=>{const c=sn.val();if(c&&c.m>PROF.m)Object.assign(PROF,c);saveP();ui();}).catch(()=>{});}catch(e){}}
 function mkRoom(){
   if(state!=='idle')return;if(!fbU){say(L().onNeed);return;}
   const code=String(1000+Math.floor(Math.random()*9000)),ref=db().ref('rooms/'+code);
@@ -373,9 +377,7 @@ $('ovb').addEventListener('click',()=>{if(state!=='idle')return;CFG.ov=CFG.ov===
 $('lvb').addEventListener('click',()=>{if(state!=='idle')return;CFG.lv=(CFG.lv+1)%3;saveC();ui();show(L().lv+': '+L().lvn[CFG.lv]);});
 $('btb').addEventListener('click',()=>{if(state!=='idle')return;CFG.bt=(CFG.bt+1)%4;saveC();ui();show(L().bt+': '+L().btl[CFG.bt]);});
 $('rpt').addEventListener('click',()=>{if(tts)say(lastT);else{$('status').textContent='';setTimeout(()=>{$('status').textContent=lastT;},80);}});
-$('onb').addEventListener('click',()=>{if(state!=='idle')return;if(!fbU){say(L().onNeed);return;}$('onp').open=true;say(L().onHow);});
 $('mkr').addEventListener('click',mkRoom);$('jnr').addEventListener('click',joinRoom);
-$('prb').addEventListener('click',()=>say(L().pst(PROF)));
 $('nm').addEventListener('change',e=>{PROF.name=e.target.value.trim()||'Player';saveP();ui();});
 $('gsb').addEventListener('click',()=>{if(fbU)signOut();else signIn();});
 $('rep').addEventListener('click',()=>say(G.started?scoreText()+'. '+need():L().none));
@@ -396,7 +398,7 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('error',e=>show('Error: '+e.message));
 ui();show(L().hint);
-try{if(localStorage.getItem('acs'))loadFB(()=>firebase.auth().onAuthStateChanged(u=>{if(u){fbU=u;ui();}}));}catch(e){}
+try{if(localStorage.getItem('acs'))loadFB(()=>firebase.auth().onAuthStateChanged(u=>{if(u){fbU=u;ui();cloudMerge();}}));}catch(e){}
 try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 })();
 </script>
