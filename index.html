@@ -136,7 +136,8 @@ nbCall:'नो बॉल!',nbSave:'लेकिन नो बॉल थी, इ�
 let lg='en',ac,out,crowd,state='idle',ball=null,lastDown=0,tok=0,tts=false;
 const $=id=>document.getElementById(id),L=()=>S[lg],R=a=>a[Math.floor(Math.random()*a.length)];
 // Firebase settings: paste your config object here (see setup steps). Leave null until then.
-const FB_CONFIG=null;
+const FB_CONFIG={apiKey:"AIzaSyAeHP_XOEmaZfYIKdU0fSvUVQuMvT1dFMQ",authDomain:"blind-cricket-aa0c0.firebaseapp.com",projectId:"blind-cricket-aa0c0",storageBucket:"blind-cricket-aa0c0.firebasestorage.app",messagingSenderId:"933612693319",appId:"1:933612693319:web:bf05b3275cb16859e7ce62"
+/* , databaseURL:"PASTE-REALTIME-DATABASE-URL-HERE" */};
 const PROF=(()=>{const d={name:'Player',m:0,w:0,l:0,runs:0,f4:0,s6:0,best:0};try{return Object.assign(d,JSON.parse(localStorage.getItem('acp')||'{}'));}catch(e){return d;}})();
 let fbU=null;
 const saveP=()=>{try{localStorage.setItem('acp',JSON.stringify(PROF));}catch(e){}if(fbU)try{firebase.database().ref('users/'+fbU.uid).set(PROF);}catch(e){}};
@@ -174,7 +175,8 @@ function loadFB(cb){
 }
 function signIn(){loadFB(()=>firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(r=>{
   fbU=r.user;if(!PROF.name||PROF.name==='Player')PROF.name=fbU.displayName||PROF.name;
-  return firebase.database().ref('users/'+fbU.uid).get().then(sn=>{const c=sn.val();if(c&&c.m>PROF.m)Object.assign(PROF,c);saveP();ui();say(L().signed(PROF.name));});
+  ui();say(L().signed(PROF.name));
+  try{firebase.database().ref('users/'+fbU.uid).get().then(sn=>{const c=sn.val();if(c&&c.m>PROF.m){Object.assign(PROF,c);ui();}saveP();}).catch(()=>{});}catch(e){}
 }).catch(e=>say(L().fail+' '+(e.code||''))));}
 function signOut(){try{firebase.auth().signOut();}catch(e){}fbU=null;ui();}
 function nbuf(d){const n=Math.max(1,Math.floor(ac.sampleRate*d)),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;return b;}
