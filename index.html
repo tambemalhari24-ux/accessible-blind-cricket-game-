@@ -39,6 +39,8 @@ summary{font-weight:700}
 <div class="row"><button id="ovb"></button><button id="lvb"></button></div>
 <button id="btb"></button>
 <div class="row"><button id="onb"></button><button id="prb"></button></div>
+<details id="onp"><summary id="onpT"></summary><button id="mkr"></button>
+<label for="rcode" id="rcL"></label><input id="rcode" inputmode="numeric" maxlength="4" style="font:inherit;font-size:1.3rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8"><button id="jnr"></button></details>
 <details id="prof"><summary id="profT"></summary>
 <label for="nm" id="nmL"></label><input id="nm" type="text" maxlength="20" autocomplete="nickname" style="font:inherit;font-size:1.15rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8">
 <p id="pst" role="region"></p><button id="gsb"></button></details>
@@ -90,6 +92,13 @@ pst:P=>`${P.name}. Matches ${P.m}, wins ${P.w}, losses ${P.l}. Total runs ${P.ru
 noFb:'Google sign-in is not set up yet. The game owner must add the Firebase settings first.',noNet:'Could not load sign-in. Check your internet.',
 signed:n=>`Signed in as ${n}. Your profile is saved online.`,fail:'Sign-in failed.',onNeed:'Please sign in with Google first, from My profile.',
 onSoon:'You are signed in. Online rooms are coming in the next update.',
+mkr:'Create room',jnr:'Join room',rcL:'Friend\'s four digit room code',onHow:'Use Create room, or type your friend\'s code and press Join room.',
+roomMade:c=>`Room created. Tell your friend this code: ${c.split('').join(' ')}. Waiting for them to join.`,needCode:'Type the four digit code first.',notFound:'No open room with that code.',
+startBat:o=>`${o} has joined. You bat first. Listen for the ball.`,startBowl:o=>`You joined ${o}'s room. You bowl first. Press Hit left, Hit straight or Hit right to choose the line.`,
+yourBowl:'Your turn to bowl. Press Hit left, Hit straight or Hit right to choose the line.',wait:'Waiting for the bowler. Get ready.',
+swap:(s,t)=>`Innings over, ${s} runs. Roles swap now. Target ${t}.`,
+wonO:o=>`Match over. You beat ${o}! Congratulations!`,lostO:o=>`Match over. ${o} won this one. Try again!`,
+ok:{out:'Wicket!',six:'Six!',four:'Four!',runs:n=>n==1?'One run.':n+' runs.',dot:'Dot ball.'},
 nbCall:'No ball!',nbSave:'But it was a no ball, so you are not out!',fh:'Free hit! You cannot be out.',fhSave:'That would have been out, but it is a free hit, so you survive!',},
 hi:{title:'ऑडियो क्रिकेट',hint:'शुरू करने के लिए बड़ा पीला बटन दबाएँ। गेंदबाज़ की दौड़ सुनिए, फिर गेंद। जिस कान से गेंद आए, उसी तरफ का बटन (बाएँ, सीधा, दाएँ) टप्पे के ठीक बाद दबाइए। बाएँ-दाएँ सुनने के लिए हेडफ़ोन लगाएँ।',
 start:'खेल शुरू करो',shot:'शॉट मारो',again:'फिर से खेलो',prac:'अभ्यास गेंद',rep:'स्कोर बताओ',test:'आवाज़ टेस्ट',lang:'Play in English',
@@ -132,19 +141,26 @@ pst:P=>`${P.name}। मैच ${P.m}, जीत ${P.w}, हार ${P.l}। क
 noFb:'Google साइन-इन अभी सेट नहीं है। गेम के मालिक को पहले Firebase सेटिंग जोड़नी होगी।',noNet:'साइन-इन लोड नहीं हुआ। इंटरनेट जाँचिए।',
 signed:n=>`${n} के रूप में साइन इन हुए। आपकी प्रोफ़ाइल ऑनलाइन सेव है।`,fail:'साइन-इन नहीं हो पाया।',onNeed:'पहले "मेरी प्रोफ़ाइल" से Google साइन-इन कीजिए।',
 onSoon:'आप साइन इन हैं। ऑनलाइन रूम अगले अपडेट में आ रहे हैं।',
+mkr:'रूम बनाओ',jnr:'रूम में जाओ',rcL:'दोस्त का चार अंकों का रूम कोड',onHow:'रूम बनाओ दबाइए, या दोस्त का कोड लिखकर रूम में जाओ दबाइए।',
+roomMade:c=>`रूम बन गया। दोस्त को यह कोड बताइए: ${c.split('').join(' ')}। उसके आने का इंतज़ार है।`,needCode:'पहले चार अंकों का कोड लिखिए।',notFound:'इस कोड का कोई खुला रूम नहीं है।',
+startBat:o=>`${o} आ गए। आप पहले बल्लेबाज़ी करेंगे। गेंद की आवाज़ सुनिए।`,startBowl:o=>`आप ${o} के रूम में आ गए। आप पहले गेंदबाज़ी करेंगे। लाइन चुनने के लिए बाएँ, सीधा या दाएँ मारो दबाइए।`,
+yourBowl:'आपकी गेंदबाज़ी की बारी। लाइन चुनने के लिए बाएँ, सीधा या दाएँ मारो दबाइए।',wait:'गेंदबाज़ का इंतज़ार है। तैयार रहिए।',
+swap:(s,t)=>`पारी खत्म, ${s} रन। अब भूमिकाएँ बदलेंगी। लक्ष्य ${t}।`,
+wonO:o=>`मैच खत्म। आपने ${o} को हरा दिया! बधाई!`,lostO:o=>`मैच खत्म। इस बार ${o} जीते। फिर कोशिश कीजिए!`,
+ok:{out:'विकेट!',six:'छक्का!',four:'चौका!',runs:n=>n==1?'एक रन।':n+' रन।',dot:'डॉट बॉल।'},
 nbCall:'नो बॉल!',nbSave:'लेकिन नो बॉल थी, इसलिए आप आउट नहीं हैं!',fh:'फ्री हिट! इस गेंद पर आउट नहीं होंगे।',fhSave:'यह आउट होता, पर फ्री हिट है, इसलिए बच गए!',}};
 let lg='en',ac,out,crowd,state='idle',ball=null,lastDown=0,tok=0,tts=false;
 const $=id=>document.getElementById(id),L=()=>S[lg],R=a=>a[Math.floor(Math.random()*a.length)];
 // Firebase settings: paste your config object here (see setup steps). Leave null until then.
 const FB_CONFIG={apiKey:"AIzaSyAeHP_XOEmaZfYIKdU0fSvUVQuMvT1dFMQ",authDomain:"blind-cricket-aa0c0.firebaseapp.com",projectId:"blind-cricket-aa0c0",storageBucket:"blind-cricket-aa0c0.firebasestorage.app",messagingSenderId:"933612693319",appId:"1:933612693319:web:bf05b3275cb16859e7ce62"
-/* , databaseURL:"PASTE-REALTIME-DATABASE-URL-HERE" */};
+,databaseURL:"https://blind-cricket-aa0c0-default-rtdb.firebaseio.com"};
 const PROF=(()=>{const d={name:'Player',m:0,w:0,l:0,runs:0,f4:0,s6:0,best:0};try{return Object.assign(d,JSON.parse(localStorage.getItem('acp')||'{}'));}catch(e){return d;}})();
 let fbU=null;
 const saveP=()=>{try{localStorage.setItem('acp',JSON.stringify(PROF));}catch(e){}if(fbU)try{firebase.database().ref('users/'+fbU.uid).set(PROF);}catch(e){}};
 const G={runs:0,balls:0,wk:0,target:0,started:false,over:false};
 const CFG=(()=>{const d={ov:2,lv:1,bt:0,best:0};try{return Object.assign(d,JSON.parse(localStorage.getItem('acr')||'{}'));}catch(e){return d;}})();
 const saveC=()=>{try{localStorage.setItem('acr',JSON.stringify(CFG));}catch(e){}};
-const TB=()=>CFG.ov*6,MW=()=>CFG.ov===2?3:5,K=()=>[1.6,1,.75][CFG.lv],OFF=()=>[0,.08,.16,.24][CFG.bt];
+let onl=null;const OVN=()=>onl?onl.ov:CFG.ov,TB=()=>OVN()*6,MW=()=>OVN()===2?3:5,K=()=>[1.6,1,.75][CFG.lv],OFF=()=>[0,.08,.16,.24][CFG.bt];
 const over=()=>G.runs>=G.target||G.balls>=TB()||G.wk>=MW();
 let lastT='';function show(t){lastT=t;$('status').textContent=t;}
 function say(t,cb){
@@ -158,7 +174,7 @@ const need=()=>L().need(G.target-G.runs,TB()-G.balls,MW()-G.wk);
 const scoreText=()=>G.started?L().sc(G.runs,G.wk,G.balls,G.target):L().none;
 function ui(){
   const l=L();$('score').textContent=scoreText();
-  $('hit').textContent=(G.started&&!G.over)?l.playing:(G.over?l.again:l.start);$('hit').disabled=G.started&&!G.over;$('sL').textContent=l.sL;$('sC').textContent=l.sC;$('sR').textContent=l.sR;$('vibl').textContent=l.vib;$('ovb').textContent=l.ovl(CFG.ov);$('lvb').textContent=l.lv+': '+l.lvn[CFG.lv];$('btb').textContent=l.bt+': '+l.btl[CFG.bt];$('rpt').textContent=l.rpt;$('onb').textContent=l.onl;$('prb').textContent=l.prof;$('profT').textContent=l.prof;$('nmL').textContent=l.nmL;$('gsb').textContent=fbU?l.gout:l.gin;$('pst').textContent=l.pst(PROF);if(document.activeElement!==$('nm'))$('nm').value=PROF.name;
+  $('hit').textContent=(G.started&&!G.over)?l.playing:(G.over?l.again:l.start);$('hit').disabled=G.started&&!G.over;$('sL').textContent=l.sL;$('sC').textContent=l.sC;$('sR').textContent=l.sR;$('vibl').textContent=l.vib;$('ovb').textContent=l.ovl(CFG.ov);$('lvb').textContent=l.lv+': '+l.lvn[CFG.lv];$('btb').textContent=l.bt+': '+l.btl[CFG.bt];$('rpt').textContent=l.rpt;$('mkr').textContent=l.mkr;$('jnr').textContent=l.jnr;$('rcL').textContent=l.rcL;$('onpT').textContent=l.onl;$('onb').textContent=l.onl;$('prb').textContent=l.prof;$('profT').textContent=l.prof;$('nmL').textContent=l.nmL;$('gsb').textContent=fbU?l.gout:l.gin;$('pst').textContent=l.pst(PROF);if(document.activeElement!==$('nm'))$('nm').value=PROF.name;
   $('title').textContent=l.title;$('prac').textContent=l.prac;$('rep').textContent=l.rep;$('test').textContent=l.test;
   $('langb').textContent=l.lang;$('ttsl').textContent=l.tts;$('rulesT').textContent=l.rulesT;
   $('rulesB').innerHTML=l.rules.map(p=>'<p>'+p+'</p>').join('');
@@ -174,11 +190,63 @@ function loadFB(cb){
   nx();
 }
 function signIn(){loadFB(()=>firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(r=>{
-  fbU=r.user;if(!PROF.name||PROF.name==='Player')PROF.name=fbU.displayName||PROF.name;
+  fbU=r.user;try{localStorage.setItem('acs','1');}catch(e){}if(!PROF.name||PROF.name==='Player')PROF.name=fbU.displayName||PROF.name;
   ui();say(L().signed(PROF.name));
   try{firebase.database().ref('users/'+fbU.uid).get().then(sn=>{const c=sn.val();if(c&&c.m>PROF.m){Object.assign(PROF,c);ui();}saveP();}).catch(()=>{});}catch(e){}
 }).catch(e=>say(L().fail+' '+(e.code||''))));}
-function signOut(){try{firebase.auth().signOut();}catch(e){}fbU=null;ui();}
+const db=()=>firebase.database();
+function mkRoom(){
+  if(state!=='idle')return;if(!fbU){say(L().onNeed);return;}
+  const code=String(1000+Math.floor(Math.random()*9000)),ref=db().ref('rooms/'+code);
+  ref.set({host:{uid:fbU.uid,name:PROF.name},st:'lobby',ov:CFG.ov,t:Date.now()}).then(()=>{
+    say(L().roomMade(code));
+    ref.child('st').on('value',sn=>{if(sn.val()==='play'){ref.child('st').off();ref.get().then(x=>startOnline(ref,x.val(),true));}});
+  }).catch(()=>say(L().fail));
+}
+function joinRoom(){
+  if(state!=='idle')return;if(!fbU){say(L().onNeed);return;}
+  const code=$('rcode').value.trim();if(code.length!==4){say(L().needCode);return;}
+  const ref=db().ref('rooms/'+code);
+  ref.get().then(x=>{const v=x.val();if(!v||v.st!=='lobby'||!v.host){say(L().notFound);return;}
+    return ref.update({guest:{uid:fbU.uid,name:PROF.name},st:'play'}).then(()=>startOnline(ref,Object.assign(v,{guest:{name:PROF.name}}),false));
+  }).catch(()=>say(L().fail));
+}
+function startOnline(ref,v,host){
+  initAudio();
+  onl={ref,ov:v.ov,host,inn:0,bat:host,lastN:0,lastR:0,my:0,txt:'',off:0,opp:host?v.guest.name:v.host.name};
+  db().ref('.info/serverTimeOffset').once('value').then(sn=>{if(onl)onl.off=sn.val()||0;});
+  Object.assign(G,{runs:0,balls:0,wk:0,target:999,started:true,over:false,fum:0,f4:0,s6:0,fh:false});
+  ref.child('ball').on('value',sn=>{const b=sn.val();if(!b||!onl||b.n<=onl.lastN)return;onl.lastN=b.n;
+    ball={i:b.i,T:[1.45,1.8,2.3][b.i],spin:b.i===2,line:b.line,nb:!!b.nb,wd:!!b.wd,prac:false};
+    state=onl.bat?'bowl':'wait';deliver(Math.max(.1,(b.at-(Date.now()+onl.off))/1000));});
+  ref.child('res').on('value',sn=>{const r=sn.val();if(r&&onl)onRes(r);});
+  ui();
+  if(host){state='owait';say(L().startBat(onl.opp));}else{state='obowl';say(L().startBowl(onl.opp));}
+}
+function sendBall(s){
+  state='wait';const nb=Math.random()<.1,wd=!nb&&s!==0&&Math.random()<.12;
+  onl.ref.child('ball').set({n:onl.lastN+1,i:R([0,1,2]),line:s,nb:nb?1:0,wd:wd?1:0,at:Date.now()+onl.off+1500});
+}
+function onRes(res){
+  if(res.n<=onl.lastR)return;onl.lastR=res.n;const l=L();
+  const ok=l.ok,txt=(onl.bat&&onl.txt)?onl.txt:(res.nb?l.nbCall+' ':'')+(res.wd?l.wide+' ':'')+(res.w?ok.out:res.r===6?ok.six:res.r===4?ok.four:res.r?ok.runs(res.r):ok.dot);
+  onl.txt='';
+  if(!res.nb&&!res.wd)G.balls++;
+  G.runs+=res.r+res.x;if(res.w)G.wk++;G.fh=!!res.nb;
+  if(onl.bat){if(res.r===4)PROF.f4++;if(res.r===6)PROF.s6++;}
+  ui();say(txt+(over()?'':' '+l.after(G.runs,G.wk)+(G.fh?' '+l.fh:'')),()=>setTimeout(onNext,600));
+}
+function onNext(){
+  if(!onl)return;const l=L();
+  if(!over()){if(onl.bat){state='owait';show(l.wait);}else{state='obowl';say(l.yourBowl);}return;}
+  if(onl.bat)onl.my=G.runs;
+  if(onl.inn===0){const sc=G.runs;onl.inn=1;onl.bat=!onl.bat;Object.assign(G,{target:sc+1,runs:0,balls:0,wk:0,fh:false});ui();say(l.swap(sc,sc+1),onNext);return;}
+  const won=onl.bat?G.runs>=G.target:G.runs<G.target;
+  PROF.m++;if(won)PROF.w++;else PROF.l++;PROF.runs+=onl.my;if(onl.my>PROF.best)PROF.best=onl.my;saveP();
+  try{onl.ref.child('ball').off();onl.ref.child('res').off();}catch(e){}
+  const o=onl.opp;onl=null;G.started=false;G.over=false;state='idle';ui();cheer(won);say(won?l.wonO(o):l.lostO(o),()=>{});
+}
+function signOut(){try{firebase.auth().signOut();}catch(e){}fbU=null;try{localStorage.removeItem('acs');}catch(e){}ui();}
 function nbuf(d){const n=Math.max(1,Math.floor(ac.sampleRate*d)),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;return b;}
 function panner(p){let n;if(ac.createStereoPanner){n=ac.createStereoPanner();n.pan.value=p;}else n=ac.createGain();n.connect(out);return n;}
 function initAudio(){
@@ -234,8 +302,8 @@ function nextBall(){
   if(G.fh)pre+=l.fh+' ';
   say(l.ball(Math.floor(G.balls/6)+1,G.balls%6+1,l.names[ball.i],need())+' '+pre,()=>setTimeout(deliver,500));
 }
-function deliver(){
-  const t0=ac.currentTime+.2,all=[0,.55,1,1.35,1.65,1.9],steps=ball.spin?all.slice(0,3):all;
+function deliver(dl){
+  const t0=ac.currentTime+(dl==null?.2:dl),all=[0,.55,1,1.35,1.65,1.9],steps=ball.spin?all.slice(0,3):all;
   steps.forEach((s,i)=>burst(t0+s,.09,{g:.22+i*.05,p:-.1,fr:300,q:2}));
   const rel=t0+steps[steps.length-1]+.25;
   burst(rel-.02,.25,{g:.2,fr:2600});
@@ -245,6 +313,7 @@ function deliver(){
 }
 function tap(s){
   initAudio();
+  if(onl&&!onl.bat){if(state==='obowl')sendBall(s);return;}
   if(state==='idle'){startMatch();return;}
   if(state!=='bowl')return;
   const d=ac.currentTime-ball.hitAt;
@@ -252,6 +321,7 @@ function tap(s){
   clearTimeout(ball.timer);resolve(d,s);
 }
 function resolve(d,s){
+  if(onl&&!onl.bat)return;
   state='wait';const l=L(),t=ac.currentTime,Ln=ball.line,fh=G.fh&&!ball.prac;
   let r=0,wkt=false,ct=false,txt,a=9,p=0,sh=l.shots[(s||0)+1];
   if(d!==null){a=Math.abs(d)/K();const mm=Math.abs(s-Ln);if(mm===1)a+=.14;else if(mm===2)a=9;p=s*.8;}
@@ -277,6 +347,7 @@ function resolve(d,s){
   if(ball.nb){extra=1;if(wkt){wkt=false;txt+=' '+l.nbSave;}txt=l.nbCall+' '+txt;}
   vib(wkt?300:r===6?[120,60,120,60,200]:r===4?[80,40,80]:r?[50]:d===null?[]:[25]);
   if(r===6)cheer(true);else if(r)cheer(false);
+  if(onl){onl.txt=txt;onl.ref.child('res').set({n:onl.lastN,r,w:wkt?1:0,x:extra,nb:ball.nb?1:0,wd:(ball.wd&&d===null)?1:0});return;}
   if(ball.prac){say(txt+' '+l.pracEnd,()=>{state='idle';});return;}
   if(!ball.nb&&!(ball.wd&&d===null))G.balls++;
   if(r===4)G.f4++;if(r===6)G.s6++;
@@ -295,14 +366,15 @@ $('hit').addEventListener('click',()=>{initAudio();if(state==='idle')startMatch(
   b.addEventListener('pointerdown',()=>{lastDown=performance.now();tap(sd);});
   b.addEventListener('click',()=>{if(performance.now()-lastDown>500)tap(sd);});});
 $('prac').addEventListener('click',()=>{
-  if(state==='bowl'||state==='wait')return;initAudio();
+  if(onl||state==='bowl'||state==='wait')return;initAudio();
   ball=pick(true);state='wait';say(L().pracBall(L().names[ball.i]),()=>setTimeout(deliver,500));
 });
 $('ovb').addEventListener('click',()=>{if(state!=='idle')return;CFG.ov=CFG.ov===2?5:2;saveC();ui();show(L().ovl(CFG.ov));});
 $('lvb').addEventListener('click',()=>{if(state!=='idle')return;CFG.lv=(CFG.lv+1)%3;saveC();ui();show(L().lv+': '+L().lvn[CFG.lv]);});
 $('btb').addEventListener('click',()=>{if(state!=='idle')return;CFG.bt=(CFG.bt+1)%4;saveC();ui();show(L().bt+': '+L().btl[CFG.bt]);});
 $('rpt').addEventListener('click',()=>{if(tts)say(lastT);else{$('status').textContent='';setTimeout(()=>{$('status').textContent=lastT;},80);}});
-$('onb').addEventListener('click',()=>{if(state!=='idle')return;say(fbU?L().onSoon:L().onNeed);});
+$('onb').addEventListener('click',()=>{if(state!=='idle')return;if(!fbU){say(L().onNeed);return;}$('onp').open=true;say(L().onHow);});
+$('mkr').addEventListener('click',mkRoom);$('jnr').addEventListener('click',joinRoom);
 $('prb').addEventListener('click',()=>say(L().pst(PROF)));
 $('nm').addEventListener('change',e=>{PROF.name=e.target.value.trim()||'Player';saveP();ui();});
 $('gsb').addEventListener('click',()=>{if(fbU)signOut();else signIn();});
@@ -324,6 +396,7 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('error',e=>show('Error: '+e.message));
 ui();show(L().hint);
+try{if(localStorage.getItem('acs'))loadFB(()=>firebase.auth().onAuthStateChanged(u=>{if(u){fbU=u;ui();}}));}catch(e){}
 try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 })();
 </script>
