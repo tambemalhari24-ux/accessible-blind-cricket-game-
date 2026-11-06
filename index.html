@@ -25,6 +25,9 @@ label{display:flex;gap:10px;align-items:flex-start;margin:10px 0}
 input[type=checkbox]{width:26px;height:26px;flex:none}
 details{background:var(--turf);border:2px solid var(--chalk);border-radius:12px;padding:10px 14px;margin-top:10px}
 summary{font-weight:700}
+dialog{background:#15532a;color:#f6f3e8;border:3px solid #f6f3e8;border-radius:14px;width:min(92vw,520px)}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+h2{font-size:1.3rem;margin:6px 0}
 </style>
 </head>
 <body>
@@ -32,22 +35,27 @@ summary{font-weight:700}
 <h1 id="title"></h1>
 <p id="score"></p>
 <p id="status" role="status" aria-live="polite"></p>
+<section id="welc" hidden><h2 id="welcT"></h2><p id="welcP"></p><button id="wgs"></button><button id="skp"></button></section>
 <div id="shots" hidden>
+<p id="roleLine"></p>
 <div class="row"><button class="shot" id="sL" data-s="-1"></button><button class="shot" id="sC" data-s="0"></button><button class="shot" id="sR" data-s="1"></button></div>
-<div class="row"><button id="rpt"></button><button id="rep"></button></div>
+<button id="rep"></button><button id="rpt" hidden></button>
 </div>
+<section id="lobby" hidden><h2 id="lobT"></h2><p id="lobInfo"></p><div id="plist"></div><button id="stg" hidden></button><button id="lcn"></button></section>
 <details id="prof" open><summary id="profT"></summary>
-<label for="nm" id="nmL"></label><input id="nm" type="text" maxlength="20" autocomplete="nickname" style="font:inherit;font-size:1.2rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8">
 <p id="pst" role="region"></p><button id="gsb"></button></details>
-<details id="offp"><summary id="offT"></summary>
-<button id="hit"></button><button id="prac"></button><button id="ovb"></button><button id="lvb"></button></details>
-<details id="onp"><summary id="onpT"></summary><button id="mkr"></button>
-<label for="rcode" id="rcL"></label><input id="rcode" inputmode="numeric" maxlength="4" style="font:inherit;font-size:1.2rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8"><button id="jnr"></button></details>
 <details id="setp"><summary id="setT"></summary>
 <button id="langb"></button><button id="test"></button><button id="btb"></button>
 <label><input type="checkbox" id="vibc" checked><span id="vibl"></span></label>
 <label><input type="checkbox" id="tts"><span id="ttsl"></span></label></details>
+<details id="offp"><summary id="offT"></summary>
+<button id="hit"></button><button id="prac"></button><button id="ovb"></button><button id="lvb"></button></details>
+<details id="onp"><summary id="onpT"></summary><button id="mkr"></button><h2 id="rlT"></h2><div id="rlist"></div></details>
 <details id="rul"><summary id="rulesT"></summary><div id="rulesB"></div></details>
+<dialog id="dlg" aria-labelledby="dlgT"><h2 id="dlgT"></h2>
+<label for="ovn" id="ovL"></label><input id="ovn" type="number" min="1" max="20" value="2" style="font:inherit;font-size:1.2rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8">
+<label for="wkn" id="wkL"></label><input id="wkn" type="number" min="1" max="10" value="3" style="font:inherit;font-size:1.2rem;padding:12px;width:100%;border-radius:10px;border:3px solid #f6f3e8">
+<button id="dcr"></button><button id="dcn"></button></dialog>
 </main>
 <script>
 (function(){
@@ -101,6 +109,17 @@ swap:(s,t)=>`Innings over, ${s} runs. Roles swap now. Target ${t}.`,
 wonO:o=>`Match over. You beat ${o}! Congratulations!`,lostO:o=>`Match over. ${o} won this one. Try again!`,
 ok:{out:'Wicket!',six:'Six!',four:'Four!',runs:n=>n==1?'One run.':n+' runs.',dot:'Dot ball.'},
 offl:'Play vs computer',setl:'Settings',inS:'Signed in with Google.',outS:'Not signed in. Sign in once, and the game remembers you.',
+welcT:'Welcome to Audio Cricket!',welcP:'Sign in with Google to save your profile and play online with friends.',skp:'Continue without signing in',
+dlgT:'Create room',ovL:'Overs (1 to 20)',wkL:'Wickets (1 to 10)',dcn:'Cancel',lobT:'Your room code',shb:'Share code',lcn:'Cancel room',
+shareT:c=>`Join my Audio Cricket room! Code: ${c}`,copied:'Code copied.',cancelled:'Room cancelled.',
+rmade:'Room created. Wait for players to join, select one player, then press Start game.',joinedR:'You joined the room. Wait for the host to select a player and start the game.',
+left:'You left the room.',roomGone:'The room was closed.',notPicked:'The host started a match with another player. You can join another room.',notFound:'That room is no longer open.',
+lobMine:'Your room',lobJoined:h=>`${h}'s room`,lobInfo:(ov,wk,n,sel)=>`${ov} overs, ${wk} wickets. ${n} waiting. ${sel?'Selected: '+sel+'.':'No player selected yet.'}`,
+select:'Select',selected:'Selected',stg:'Start game',leave:'Leave room',noRooms:'No open rooms right now. Create one.',rlT:'Open rooms',
+roomBtn:(h,ov,wk,n)=>`Join ${h}'s room: ${ov} overs, ${wk} wickets, ${n} waiting`,
+tossT:n=>`Toss done. ${n} will bat first.`,batIntro:'You are batting. Listen for the ball.',bowlIntro:'You are bowling. Press Hit left, Hit straight or Hit right to choose the line.',
+youBat:o=>`You are batting. ${o} is bowling.`,youBowl:o=>`You are bowling. ${o} is batting.`,
+needA:(b,w)=>`${b} balls left, ${w} wickets left`,scA:(r,w,b)=>`${r} for ${w}, over ${Math.floor(b/6)}.${b%6}`,
 nbCall:'No ball!',nbSave:'But it was a no ball, so you are not out!',fh:'Free hit! You cannot be out.',fhSave:'That would have been out, but it is a free hit, so you survive!',},
 hi:{title:'ऑडियो क्रिकेट',hint:'शुरू करने के लिए बड़ा पीला बटन दबाएँ। गेंदबाज़ की दौड़ सुनिए, फिर गेंद। जिस कान से गेंद आए, उसी तरफ का बटन (बाएँ, सीधा, दाएँ) टप्पे के ठीक बाद दबाइए। बाएँ-दाएँ सुनने के लिए हेडफ़ोन लगाएँ।',
 start:'खेल शुरू करो',shot:'शॉट मारो',again:'फिर से खेलो',prac:'अभ्यास गेंद',rep:'स्कोर बताओ',test:'आवाज़ टेस्ट',lang:'Play in English',
@@ -151,6 +170,17 @@ swap:(s,t)=>`पारी खत्म, ${s} रन। अब भूमिका
 wonO:o=>`मैच खत्म। आपने ${o} को हरा दिया! बधाई!`,lostO:o=>`मैच खत्म। इस बार ${o} जीते। फिर कोशिश कीजिए!`,
 ok:{out:'विकेट!',six:'छक्का!',four:'चौका!',runs:n=>n==1?'एक रन।':n+' रन।',dot:'डॉट बॉल।'},
 offl:'कंप्यूटर के खिलाफ खेलो',setl:'सेटिंग',inS:'Google से साइन इन है।',outS:'साइन इन नहीं है। एक बार साइन इन कीजिए, गेम याद रखेगा।',
+welcT:'Audio Cricket में स्वागत है!',welcP:'अपनी प्रोफ़ाइल सेव करने और दोस्तों के साथ ऑनलाइन खेलने के लिए Google से साइन इन कीजिए।',skp:'बिना साइन इन के आगे बढ़ें',
+dlgT:'रूम बनाओ',ovL:'ओवर (1 से 20)',wkL:'विकेट (1 से 10)',dcn:'रद्द करो',lobT:'आपका रूम कोड',shb:'कोड शेयर करो',lcn:'रूम रद्द करो',
+shareT:c=>`मेरे Audio Cricket रूम में आइए! कोड: ${c}`,copied:'कोड कॉपी हो गया।',cancelled:'रूम रद्द हो गया।',
+rmade:'रूम बन गया। खिलाड़ियों का इंतज़ार कीजिए, एक खिलाड़ी चुनिए, फिर खेल शुरू करो दबाइए।',joinedR:'आप रूम में आ गए। होस्ट के खिलाड़ी चुनने और खेल शुरू करने का इंतज़ार कीजिए।',
+left:'आपने रूम छोड़ दिया।',roomGone:'रूम बंद हो गया।',notPicked:'होस्ट ने दूसरे खिलाड़ी के साथ मैच शुरू कर दिया। आप दूसरे रूम में जा सकते हैं।',notFound:'वह रूम अब खुला नहीं है।',
+lobMine:'आपका रूम',lobJoined:h=>`${h} का रूम`,lobInfo:(ov,wk,n,sel)=>`${ov} ओवर, ${wk} विकेट। ${n} इंतज़ार में। ${sel?'चुना गया: '+sel+'।':'अभी कोई खिलाड़ी नहीं चुना।'}`,
+select:'चुनो',selected:'चुना गया',stg:'खेल शुरू करो',leave:'रूम छोड़ो',noRooms:'अभी कोई खुला रूम नहीं है। एक बनाइए।',rlT:'खुले रूम',
+roomBtn:(h,ov,wk,n)=>`${h} के रूम में जाओ: ${ov} ओवर, ${wk} विकेट, ${n} इंतज़ार में`,
+tossT:n=>`टॉस हो गया। ${n} पहले बल्लेबाज़ी करेंगे।`,batIntro:'आप बल्लेबाज़ी कर रहे हैं। गेंद की आवाज़ सुनिए।',bowlIntro:'आप गेंदबाज़ी कर रहे हैं। लाइन चुनने के लिए बाएँ, सीधा या दाएँ मारो दबाइए।',
+youBat:o=>`आप बल्लेबाज़ी कर रहे हैं। ${o} गेंदबाज़ी कर रहे हैं।`,youBowl:o=>`आप गेंदबाज़ी कर रहे हैं। ${o} बल्लेबाज़ी कर रहे हैं।`,
+needA:(b,w)=>`${b} गेंदें बाकी, ${w} विकेट बाकी`,scA:(r,w,b)=>`${r}/${w}, ओवर ${Math.floor(b/6)}.${b%6}`,
 nbCall:'नो बॉल!',nbSave:'लेकिन नो बॉल थी, इसलिए आप आउट नहीं हैं!',fh:'फ्री हिट! इस गेंद पर आउट नहीं होंगे।',fhSave:'यह आउट होता, पर फ्री हिट है, इसलिए बच गए!',}};
 let lg='en',ac,out,crowd,state='idle',ball=null,lastDown=0,tok=0,tts=false;
 const $=id=>document.getElementById(id),L=()=>S[lg],R=a=>a[Math.floor(Math.random()*a.length)];
@@ -163,7 +193,7 @@ const saveP=()=>{try{localStorage.setItem('acp',JSON.stringify(PROF));}catch(e){
 const G={runs:0,balls:0,wk:0,target:0,started:false,over:false};
 const CFG=(()=>{const d={ov:2,lv:1,bt:0,best:0};try{return Object.assign(d,JSON.parse(localStorage.getItem('acr')||'{}'));}catch(e){return d;}})();
 const saveC=()=>{try{localStorage.setItem('acr',JSON.stringify(CFG));}catch(e){}};
-let onl=null;const OVN=()=>onl?onl.ov:CFG.ov,TB=()=>OVN()*6,MW=()=>OVN()===2?3:5,K=()=>[1.6,1,.75][CFG.lv],OFF=()=>[0,.08,.16,.24][CFG.bt];
+let onl=null,lob=null,skipW=false,acsF=(()=>{try{return !!localStorage.getItem('acs');}catch(e){return false;}})();const OVN=()=>onl?onl.ov:CFG.ov,TB=()=>OVN()*6,MW=()=>onl?onl.wk:(OVN()===2?3:5),K=()=>[1.6,1,.75][CFG.lv],OFF=()=>[0,.08,.16,.24][CFG.bt];
 const over=()=>G.runs>=G.target||G.balls>=TB()||G.wk>=MW();
 let lastT='';function show(t){lastT=t;$('status').textContent=t;}
 function say(t,cb){
@@ -173,11 +203,18 @@ function say(t,cb){
   try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=L().sp;u.onend=f;u.onerror=f;speechSynthesis.speak(u);}catch(e){}
   setTimeout(f,1500+t.length*130);
 }
-const need=()=>L().need(G.target-G.runs,TB()-G.balls,MW()-G.wk);
-const scoreText=()=>G.started?L().sc(G.runs,G.wk,G.balls,G.target):L().none;
+const need=()=>(onl&&onl.inn===0)?L().needA(TB()-G.balls,MW()-G.wk):L().need(G.target-G.runs,TB()-G.balls,MW()-G.wk);
+const scoreText=()=>G.started?((onl&&onl.inn===0)?L().scA(G.runs,G.wk,G.balls):L().sc(G.runs,G.wk,G.balls,G.target)):L().none;
 function ui(){
   const l=L();$('score').textContent=scoreText();
-  $('hit').textContent=(G.started&&!G.over)?l.playing:(G.over?l.again:l.start);$('hit').disabled=G.started&&!G.over;$('sL').textContent=l.sL;$('sC').textContent=l.sC;$('sR').textContent=l.sR;$('vibl').textContent=l.vib;$('ovb').textContent=l.ovl(CFG.ov);$('lvb').textContent=l.lv+': '+l.lvn[CFG.lv];$('btb').textContent=l.bt+': '+l.btl[CFG.bt];$('rpt').textContent=l.rpt;const inM=G.started&&!G.over;$('shots').hidden=!inM;['prof','offp','onp','setp','rul'].forEach(i=>{$(i).hidden=inM;});$('mkr').textContent=l.mkr;$('jnr').textContent=l.jnr;$('rcL').textContent=l.rcL;$('onpT').textContent=l.onl;$('offT').textContent=l.offl;$('setT').textContent=l.setl;$('profT').textContent=l.prof;$('nmL').textContent=l.nmL;$('gsb').textContent=fbU?l.gout:l.gin;$('pst').textContent=l.pst(PROF)+' '+(fbU?l.inS:l.outS);if(document.activeElement!==$('nm'))$('nm').value=PROF.name;
+  $('hit').textContent=(G.started&&!G.over)?l.playing:(G.over?l.again:l.start);$('hit').disabled=G.started&&!G.over;$('sL').textContent=l.sL;$('sC').textContent=l.sC;$('sR').textContent=l.sR;$('vibl').textContent=l.vib;$('ovb').textContent=l.ovl(CFG.ov);$('lvb').textContent=l.lv+': '+l.lvn[CFG.lv];$('btb').textContent=l.bt+': '+l.btl[CFG.bt];$('rpt').textContent=l.rpt;const inM=G.started&&!G.over,wv=!fbU&&!skipW&&!acsF&&!inM&&!lob,busy=inM||!!lob||wv;
+  $('shots').hidden=!inM;$('welc').hidden=!wv;$('lobby').hidden=!lob;
+  ['prof','setp','offp','onp','rul'].forEach(i=>{$(i).hidden=busy;});
+  if(lob)renderLobby();
+  $('roleLine').textContent=onl?(onl.bat?l.youBat(onl.opp):l.youBowl(onl.opp)):'';
+  $('welcT').textContent=l.welcT;$('welcP').textContent=l.welcP;$('wgs').textContent=l.gin;$('skp').textContent=l.skp;
+  $('dlgT').textContent=l.dlgT;$('ovL').textContent=l.ovL;$('wkL').textContent=l.wkL;$('dcr').textContent=l.mkr;$('dcn').textContent=l.dcn;
+  $('stg').textContent=l.stg;$('mkr').textContent=l.mkr;$('onpT').textContent=l.onl;$('rlT').textContent=l.rlT;$('offT').textContent=l.offl;$('setT').textContent=l.setl;$('profT').textContent=l.prof;$('gsb').textContent=fbU?l.gout:l.gin;$('pst').textContent=l.pst(PROF)+' '+(fbU?l.inS:l.outS);
   $('title').textContent=l.title;$('prac').textContent=l.prac;$('rep').textContent=l.rep;$('test').textContent=l.test;
   $('langb').textContent=l.lang;$('ttsl').textContent=l.tts;$('rulesT').textContent=l.rulesT;
   $('rulesB').innerHTML=l.rules.map(p=>'<p>'+p+'</p>').join('');
@@ -193,39 +230,86 @@ function loadFB(cb){
   nx();
 }
 function signIn(){loadFB(()=>firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(r=>{
-  fbU=r.user;try{localStorage.setItem('acs','1');}catch(e){}if(!PROF.name||PROF.name==='Player')PROF.name=fbU.displayName||PROF.name;
+  fbU=r.user;acsF=true;try{localStorage.setItem('acs','1');}catch(e){}PROF.name=fbU.displayName||(fbU.email||'Player').split('@')[0];
   ui();say(L().signed(PROF.name));
   cloudMerge();
 }).catch(e=>say(L().fail+' '+(e.code||''))));}
 const db=()=>firebase.database();
-function cloudMerge(){try{firebase.database().ref('users/'+fbU.uid).get().then(sn=>{const c=sn.val();if(c&&c.m>PROF.m)Object.assign(PROF,c);saveP();ui();}).catch(()=>{});}catch(e){}}
+function cloudMerge(){try{firebase.database().ref('users/'+fbU.uid).get().then(sn=>{const c=sn.val();if(c&&c.m>PROF.m)Object.assign(PROF,c);PROF.name=fbU.displayName||(fbU.email||'Player').split('@')[0];saveP();ui();}).catch(()=>{});}catch(e){}}
 function mkRoom(){
-  if(state!=='idle')return;if(!fbU){say(L().onNeed);return;}
-  const code=String(1000+Math.floor(Math.random()*9000)),ref=db().ref('rooms/'+code);
-  ref.set({host:{uid:fbU.uid,name:PROF.name},st:'lobby',ov:CFG.ov,t:Date.now()}).then(()=>{
-    say(L().roomMade(code));
-    ref.child('st').on('value',sn=>{if(sn.val()==='play'){ref.child('st').off();ref.get().then(x=>startOnline(ref,x.val(),true));}});
+  if(state!=='idle'||lob)return;if(!fbU){say(L().onNeed);return;}
+  const d=$('dlg');if(d.showModal)d.showModal();else makeRoom(CFG.ov,CFG.ov===2?3:5);
+}
+function makeRoom(ov,wk){
+  const ref=db().ref('rooms').push();
+  ref.set({host:{uid:fbU.uid,name:PROF.name},st:'lobby',ov,wk,t:Date.now()}).then(()=>{
+    try{ref.onDisconnect().remove();}catch(e){}
+    openLobby(ref,true);say(L().rmade);
   }).catch(()=>say(L().fail));
 }
-function joinRoom(){
-  if(state!=='idle')return;if(!fbU){say(L().onNeed);return;}
-  const code=$('rcode').value.trim();if(code.length!==4){say(L().needCode);return;}
-  const ref=db().ref('rooms/'+code);
+function joinRoom(id){
+  if(state!=='idle'||lob)return;if(!fbU){say(L().onNeed);return;}
+  const ref=db().ref('rooms/'+id);
   ref.get().then(x=>{const v=x.val();if(!v||v.st!=='lobby'||!v.host){say(L().notFound);return;}
-    return ref.update({guest:{uid:fbU.uid,name:PROF.name},st:'play'}).then(()=>startOnline(ref,Object.assign(v,{guest:{name:PROF.name}}),false));
+    const me=ref.child('pl/'+fbU.uid);
+    return me.set({name:PROF.name,t:Date.now()}).then(()=>{try{me.onDisconnect().remove();}catch(e){}openLobby(ref,false);say(L().joinedR);});
   }).catch(()=>say(L().fail));
+}
+function openLobby(ref,host){
+  watchRooms(false);lob={ref,host,d:null};
+  ref.on('value',sn=>{
+    if(!lob||lob.ref!==ref)return;const d=sn.val();
+    if(!d||!d.host){ref.off();lob=null;closeUi();say(L().roomGone);return;}
+    lob.d=d;
+    if(d.st==='play'){
+      if(host||d.sel===fbU.uid){ref.off();lob=null;startOnline(ref,d,host);}
+      else{ref.off();lob=null;closeUi();say(L().notPicked);}
+      return;}
+    ui();});
+  ui();
+}
+function closeUi(){ui();if($('onp').open)watchRooms(true);}
+function leaveLobby(){
+  if(!lob)return;const host=lob.host,ref=lob.ref;lob=null;
+  try{ref.off();if(host)ref.remove();else ref.child('pl/'+fbU.uid).remove();}catch(e){}
+  closeUi();say(host?L().cancelled:L().left);
+}
+let rlRef=null;
+function watchRooms(on){
+  if(on){if(rlRef||!fbU||lob)return;rlRef=db().ref('rooms');rlRef.on('value',sn=>renderRooms(sn.val()||{}));}
+  else if(rlRef){try{rlRef.off();}catch(e){}rlRef=null;}
+}
+function renderRooms(all){
+  const l=L(),box=$('rlist');box.textContent='';let n=0;
+  Object.keys(all).forEach(id=>{const r=all[id];
+    if(!r||r.st!=='lobby'||!r.host||Date.now()-r.t>7200000)return;n++;
+    const b=document.createElement('button');b.textContent=l.roomBtn(r.host.name,r.ov,r.wk,Object.keys(r.pl||{}).length);
+    b.onclick=()=>joinRoom(id);box.appendChild(b);});
+  if(!n){const p=document.createElement('p');p.textContent=l.noRooms;box.appendChild(p);}
+}
+function renderLobby(){
+  if(!lob||!lob.d)return;const d=lob.d,l=L(),pl=d.pl||{},ids=Object.keys(pl),h=lob.host,box=$('plist');
+  $('lobT').textContent=h?l.lobMine:l.lobJoined(d.host.name);
+  $('lobInfo').textContent=l.lobInfo(d.ov,d.wk,ids.length,d.sel&&pl[d.sel]?pl[d.sel].name:null);
+  box.textContent='';
+  ids.forEach(u=>{
+    if(h){const b=document.createElement('button');b.textContent=(d.sel===u?l.selected+': ':l.select+' ')+pl[u].name;b.onclick=()=>lob&&lob.ref.child('sel').set(u);box.appendChild(b);}
+    else{const p=document.createElement('p');p.textContent=pl[u].name+(d.sel===u?' ('+l.selected+')':'');box.appendChild(p);}});
+  $('stg').hidden=!(h&&d.sel&&pl[d.sel]);$('lcn').textContent=h?l.lcn:l.leave;
 }
 function startOnline(ref,v,host){
   initAudio();
-  onl={ref,ov:v.ov,host,inn:0,bat:host,lastN:0,lastR:0,my:0,txt:'',off:0,opp:host?v.guest.name:v.host.name};
+  const first=(v.toss==='host')===host;
+  onl={ref,ov:v.ov,wk:v.wk||3,host,inn:0,bat:first,lastN:0,lastR:0,my:0,txt:'',off:0,opp:host?v.pl[v.sel].name:v.host.name};
+  watchRooms(false);
   db().ref('.info/serverTimeOffset').once('value').then(sn=>{if(onl)onl.off=sn.val()||0;});
   Object.assign(G,{runs:0,balls:0,wk:0,target:999,started:true,over:false,fum:0,f4:0,s6:0,fh:false});
   ref.child('ball').on('value',sn=>{const b=sn.val();if(!b||!onl||b.n<=onl.lastN)return;onl.lastN=b.n;
     ball={i:b.i,T:[1.45,1.8,2.3][b.i],spin:b.i===2,line:b.line,nb:!!b.nb,wd:!!b.wd,prac:false};
     state=onl.bat?'bowl':'wait';deliver(Math.max(.1,(b.at-(Date.now()+onl.off))/1000));});
   ref.child('res').on('value',sn=>{const r=sn.val();if(r&&onl)onRes(r);});
-  ui();
-  if(host){state='owait';say(L().startBat(onl.opp));}else{state='obowl';say(L().startBowl(onl.opp));}
+  ui();state=first?'owait':'obowl';const l=L();
+  say(l.tossT(first?PROF.name:onl.opp)+' '+(first?l.batIntro:l.bowlIntro));
 }
 function sendBall(s){
   state='wait';const nb=Math.random()<.1,wd=!nb&&s!==0&&Math.random()<.12;
@@ -247,10 +331,10 @@ function onNext(){
   if(onl.inn===0){const sc=G.runs;onl.inn=1;onl.bat=!onl.bat;Object.assign(G,{target:sc+1,runs:0,balls:0,wk:0,fh:false});ui();say(l.swap(sc,sc+1),onNext);return;}
   const won=onl.bat?G.runs>=G.target:G.runs<G.target;
   PROF.m++;if(won)PROF.w++;else PROF.l++;PROF.runs+=onl.my;if(onl.my>PROF.best)PROF.best=onl.my;saveP();
-  try{onl.ref.child('ball').off();onl.ref.child('res').off();}catch(e){}
-  const o=onl.opp;onl=null;G.started=false;G.over=false;state='idle';ui();cheer(won);say(won?l.wonO(o):l.lostO(o),()=>{});
+  try{onl.ref.child('ball').off();onl.ref.child('res').off();if(onl.host)onl.ref.remove();}catch(e){}
+  const o=onl.opp;onl=null;G.started=false;G.over=false;state='idle';ui();cheer(won);if($('onp').open)watchRooms(true);say(won?l.wonO(o):l.lostO(o),()=>{});
 }
-function signOut(){try{firebase.auth().signOut();}catch(e){}fbU=null;try{localStorage.removeItem('acs');}catch(e){}ui();}
+function signOut(){try{firebase.auth().signOut();}catch(e){}fbU=null;acsF=false;try{localStorage.removeItem('acs');}catch(e){}ui();}
 function nbuf(d){const n=Math.max(1,Math.floor(ac.sampleRate*d)),b=ac.createBuffer(1,n,ac.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;return b;}
 function panner(p){let n;if(ac.createStereoPanner){n=ac.createStereoPanner();n.pan.value=p;}else n=ac.createGain();n.connect(out);return n;}
 function initAudio(){
@@ -377,8 +461,14 @@ $('ovb').addEventListener('click',()=>{if(state!=='idle')return;CFG.ov=CFG.ov===
 $('lvb').addEventListener('click',()=>{if(state!=='idle')return;CFG.lv=(CFG.lv+1)%3;saveC();ui();show(L().lv+': '+L().lvn[CFG.lv]);});
 $('btb').addEventListener('click',()=>{if(state!=='idle')return;CFG.bt=(CFG.bt+1)%4;saveC();ui();show(L().bt+': '+L().btl[CFG.bt]);});
 $('rpt').addEventListener('click',()=>{if(tts)say(lastT);else{$('status').textContent='';setTimeout(()=>{$('status').textContent=lastT;},80);}});
-$('mkr').addEventListener('click',mkRoom);$('jnr').addEventListener('click',joinRoom);
-$('nm').addEventListener('change',e=>{PROF.name=e.target.value.trim()||'Player';saveP();ui();});
+$('mkr').addEventListener('click',mkRoom);
+$('dcr').addEventListener('click',()=>{const ov=Math.min(20,Math.max(1,parseInt($('ovn').value)||2)),wk=Math.min(10,Math.max(1,parseInt($('wkn').value)||3));$('dlg').close();makeRoom(ov,wk);});
+$('dcn').addEventListener('click',()=>$('dlg').close());
+$('lcn').addEventListener('click',leaveLobby);
+$('stg').addEventListener('click',()=>{if(lob&&lob.host&&lob.d&&lob.d.sel)lob.ref.update({st:'play',toss:Math.random()<.5?'host':'guest',t0:Date.now()});});
+$('onp').addEventListener('toggle',()=>watchRooms($('onp').open));
+$('wgs').addEventListener('click',()=>signIn());
+$('skp').addEventListener('click',()=>{skipW=true;ui();show(L().hint);});
 $('gsb').addEventListener('click',()=>{if(fbU)signOut();else signIn();});
 $('rep').addEventListener('click',()=>say(G.started?scoreText()+'. '+need():L().none));
 $('test').addEventListener('click',()=>{
@@ -397,8 +487,8 @@ document.addEventListener('keydown',e=>{
   if(e.key==='s'||e.key==='S')$('rep').click();
 });
 window.addEventListener('error',e=>show('Error: '+e.message));
-ui();show(L().hint);
-try{if(localStorage.getItem('acs'))loadFB(()=>firebase.auth().onAuthStateChanged(u=>{if(u){fbU=u;ui();cloudMerge();}}));}catch(e){}
+ui();show($('welc').hidden?L().hint:L().welcP);
+try{if(localStorage.getItem('acs'))loadFB(()=>firebase.auth().onAuthStateChanged(u=>{if(u){fbU=u;PROF.name=u.displayName||(u.email||'Player').split('@')[0];ui();cloudMerge();}}));}catch(e){}
 try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 })();
 </script>
