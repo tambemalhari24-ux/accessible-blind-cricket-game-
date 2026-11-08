@@ -353,7 +353,7 @@ function ui(){
   const l=L();$('score').textContent=scoreText();
   $('hit').textContent=(G.started&&!G.over)?l.playing:(G.over?l.again:l.start);$('hit').disabled=G.started&&!G.over;$('sL').textContent=l.sL;$('sC').textContent=l.sC;$('sR').textContent=l.sR;$('vibl').textContent=l.vib;$('ovb').textContent=l.ovl(CFG.ov);$('lvb').textContent=l.lv+': '+l.lvn[CFG.lv];$('btb').textContent=l.bt+': '+l.btl[CFG.bt];$('rpt').textContent=l.rpt;const inM=((G.started&&!G.over)||prac)&&!(onl&&onl.pend),pend=!!((onl&&onl.pend)||(honl&&honl.pend)),wv=!fbU&&!skipW&&!acsF&&!(G.started&&!G.over)&&!lob&&!onl&&!honl;
   const pg=wv?'welc':pend?'toss':inM?'match':(honl&&!honl.pend)?'hand':lob?'lobby':page;
-  ['welc','home','prof','set','off','on','team','score','hand','hcon','chist','rul','lobby','toss','match','hcmatch'].forEach(p=>{$('pg-'+p).hidden=p!==pg;});
+  ['welc','home','prof','set','off','on','team','score','hand','hcon','chist','rul','lobby','toss','match'].forEach(p=>{$('pg-'+p).hidden=p!==pg;});
   if(pg!==curPg){curPg=pg;const hd=$('pg-'+pg).querySelector('h1,h2');if(hd){hd.tabIndex=-1;try{hd.focus();}catch(e){}}}
   $('cvb').textContent=l.cv+': '+l.cvl[CFG.cv];$('vrec').hidden=!onl;$('vrec').textContent=rec?l.vstop:l.vrec;$('cvolb').textContent=l.cvolT+': '+l.cvoll[CFG.cvol];$('rtb').textContent=l.rtT+': '+l.rtl[CFG.rt];$('tfb').textContent=l.tfT+': '+(CFG.tf?l.onT:l.offT);$('hcb').textContent=l.hcT+': '+(CFG.hc?l.onT:l.offT);$('ltb').textContent=l.ltT+': '+(CFG.lt?l.onT:l.offT);
   $('ctT').textContent=l.ctT;$('wab').textContent=l.wab;$('wab').title=l.wabOnly;$('tut').textContent=l.tut;$('shr').textContent=l.shr;
