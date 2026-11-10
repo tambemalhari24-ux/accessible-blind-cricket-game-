@@ -47,7 +47,7 @@ h2{font-size:1.3rem;margin:6px 0}
 <div id="hcNums"></div><p id="hcInfo"></p>
 <div class="row"><button id="hgb" hidden></button><button id="hgbat" hidden></button></div>
 <button id="hcRep"></button><button class="bk"></button></section>
-<section id="pg-hcon" hidden><h2 id="hconT"></h2><p id="hconMsg"></p><button id="hcmkr"></button><h2 id="rlT3"></h2><div id="hrlist"></div><button class="bk"></button></section>
+<section id="pg-hcon" hidden><h2 id="hconT"></h2><p id="hconMsg"></p><button id="hcmkr"></button><button id="hcmkt"></button><h2 id="rlT3"></h2><div id="hrlist"></div><button class="bk"></button></section>
 <section id="pg-chist" hidden><h2 id="chT"></h2><div id="chBody"></div><button class="bk"></button></section>
 <section id="pg-score" hidden><h2 id="scT"></h2><div id="scBody"></div><button class="bk"></button></section>
 <section id="pg-rul" hidden><h2 id="rulesT"></h2><div id="rulesB"></div><button id="tut"></button><button class="bk"></button></section>
@@ -178,6 +178,10 @@ hcWaitOpp:'Waiting for an opponent to join your room.',hcOppJoined:n=>`${n} join
 hcStg:'Start game',hcYourThrow:'Your turn. Pick a number from 0 to 6.',hcOppThrow:'Waiting for the other player to throw.',
 hcOnOut:(y,b)=>`Both threw ${y}! Out!`,hcOnRun:(y,b)=>`You threw ${y}, they threw ${b}. ${y} run${y===1?'':'s'}.`,
 hcInnEnd:(r,t)=>`Innings over at ${r}. Target ${t}.`,hcOnWin:o=>`You win! You beat ${o}!`,hcOnLose:o=>`Out! ${o} wins this one.`,
+hcLobInfo:n=>`${n} waiting in this room.`,
+hcTeamRoomBtn:(h,n)=>`Join ${h}'s hand cricket team room (${n} in room)`,
+hcYourThrowT:'Your turn to throw. Pick a number from 0 to 6.',hcBatIs:n=>`${n} is batting.`,hcBowlIs:n=>`${n} is bowling.`,
+hcWatching:'You are watching this match. You can send messages and sounds.',
 nbCall:'No ball!',nbSave:'But it was a no ball, so you are not out!',fh:'Free hit! You cannot be out.',fhSave:'That would have been out, but it is a free hit, so you survive!',},
 hi:{title:'ऑडियो क्रिकेट',hint:'शुरू करने के लिए बड़ा पीला बटन दबाएँ। गेंदबाज़ की दौड़ सुनिए, फिर गेंद। जिस कान से गेंद आए, उसी तरफ का बटन (बाएँ, सीधा, दाएँ) टप्पे के ठीक बाद दबाइए। बाएँ-दाएँ सुनने के लिए हेडफ़ोन लगाएँ।',
 start:'खेल शुरू करो',shot:'शॉट मारो',again:'फिर से खेलो',prac:'अभ्यास गेंद',rep:'स्कोर बताओ',test:'आवाज़ टेस्ट',lang:'Play in English',
@@ -289,6 +293,10 @@ hcWaitOpp:'आपके रूम में किसी और के आने
 hcStg:'खेल शुरू करो',hcYourThrow:'आपकी बारी। 0 से 6 के बीच अंक चुनिए।',hcOppThrow:'दूसरे खिलाड़ी के थ्रो का इंतज़ार है।',
 hcOnOut:(y,b)=>`दोनों ने ${y} फेंका! आउट!`,hcOnRun:(y,b)=>`आपने ${y}, उन्होंने ${b} फेंका। ${y} रन।`,
 hcInnEnd:(r,t)=>`पारी ${r} पर खत्म। लक्ष्य ${t}।`,hcOnWin:o=>`आप जीत गए! आपने ${o} को हराया!`,hcOnLose:o=>`आउट! यह मैच ${o} जीते।`,
+hcLobInfo:n=>`इस रूम में ${n} इंतज़ार में।`,
+hcTeamRoomBtn:(h,n)=>`${h} के हैंड क्रिकेट टीम रूम में जाओ (${n} रूम में)`,
+hcYourThrowT:'आपकी थ्रो की बारी। 0 से 6 के बीच अंक चुनिए।',hcBatIs:n=>`${n} बल्लेबाज़ी कर रहे हैं।`,hcBowlIs:n=>`${n} गेंदबाज़ी कर रहे हैं।`,
+hcWatching:'आप यह मैच देख रहे हैं। आप संदेश और आवाज़ें भेज सकते हैं।',
 nbCall:'नो बॉल!',nbSave:'लेकिन नो बॉल थी, इसलिए आप आउट नहीं हैं!',fh:'फ्री हिट! इस गेंद पर आउट नहीं होंगे।',fhSave:'यह आउट होता, पर फ्री हिट है, इसलिए बच गए!',}};
 S.en.six.push('It sails over the rope, the crowd goes wild!','Smashed! That is gone into the stands!','What power! Six runs!');
 S.en.four.push('Cracked through the gap, no chance for the fielder!','Pure timing, it races away!','Along the ground and into the rope, four!');
@@ -358,7 +366,7 @@ function ui(){
   $('cvb').textContent=l.cv+': '+l.cvl[CFG.cv];$('vrec').hidden=!onl;$('vrec').textContent=rec?l.vstop:l.vrec;$('cvolb').textContent=l.cvolT+': '+l.cvoll[CFG.cvol];$('rtb').textContent=l.rtT+': '+l.rtl[CFG.rt];$('tfb').textContent=l.tfT+': '+(CFG.tf?l.onT:l.offT);$('hcb').textContent=l.hcT+': '+(CFG.hc?l.onT:l.offT);$('ltb').textContent=l.ltT+': '+(CFG.lt?l.onT:l.offT);
   $('ctT').textContent=l.ctT;$('wab').textContent=l.wab;$('wab').title=l.wabOnly;$('tut').textContent=l.tut;$('shr').textContent=l.shr;
   if(document.body){document.body.classList.toggle('hc',!!CFG.hc);document.body.classList.toggle('lt',!!CFG.lt);}
-  $('msgb').hidden=!onl;$('msgb').textContent=l.msgb;$('hmP').textContent=l.prof;$('hmS').textContent=l.setl;$('hmN').textContent=l.offl;$('hmO').textContent=l.onl;$('hmT').textContent=l.hmT;$('hmSc').textContent=l.hmSc;$('scT').textContent=l.scT;renderScore();$('hmH').textContent=l.hmH;$('hmHO').textContent=l.hmHO;$('hconT').textContent=l.hconT;$('hcmkr').textContent=l.mkr;$('rlT3').textContent=l.rlTT;$('hcT').textContent=l.hcT;$('hcStart').textContent=l.hcStart;$('hcPrac').textContent=l.hcPrac;$('hcRep').textContent=l.hcRep;$('chT').textContent=l.chT;hcUi();$('hmR').textContent=l.rulesT;$('ver').textContent='v24';renderHist();
+  $('msgb').hidden=!onl;$('msgb').textContent=l.msgb;$('hmP').textContent=l.prof;$('hmS').textContent=l.setl;$('hmN').textContent=l.offl;$('hmO').textContent=l.onl;$('hmT').textContent=l.hmT;$('hmSc').textContent=l.hmSc;$('scT').textContent=l.scT;renderScore();$('hmH').textContent=l.hmH;$('hmHO').textContent=l.hmHO;$('hconT').textContent=l.hconT;$('hcmkr').textContent=l.mkr;$('hcmkt').textContent=l.mkt;$('rlT3').textContent=l.rlTT;$('hcT').textContent=l.hcT;$('hcStart').textContent=l.hcStart;$('hcPrac').textContent=l.hcPrac;$('hcRep').textContent=l.hcRep;$('chT').textContent=l.chT;hcUi();$('hmR').textContent=l.rulesT;$('ver').textContent='v26';renderHist();
   document.querySelectorAll('.bk').forEach(b=>{b.textContent=l.back;});
   $('onMsg').textContent=fbU?'':l.onNeed;$('onMsg2').textContent=fbU?'':l.onNeed;$('teamT').textContent=l.hmT;$('mkt').textContent=l.mkt;$('rlT2').textContent=l.rlTT;
   const pend2=(onl&&onl.pend)?onl:(honl&&honl.pend)?honl:null;
@@ -404,15 +412,20 @@ function mkRoom(mode){
 }
 function makeRoom(ov,wk,mode){
   const ref=db().ref('rooms').push(),me={name:PROF.name,t:Date.now()},o={host:{uid:fbU.uid,name:PROF.name},st:'lobby',ov,wk,t:Date.now()};
-  if(mode==='team'||mode==='hc'){o.mode=mode;o.pl={};o.pl[fbU.uid]=me;}
+  if(mode==='team'||mode==='hc'||mode==='hct'){o.mode=mode;o.pl={};o.pl[fbU.uid]=me;}
+  if(mode==='team'||mode==='hct'){o.tm={};o.tm[fbU.uid]='A';o.cap={A:fbU.uid};}
   ref.set(o).then(()=>{
     try{ref.onDisconnect().remove();}catch(e){}
-    openLobby(ref,true);say(mode==='hc'?L().hcWaitOpp:L().rmade);
+    openLobby(ref,true);say(mode==='hc'||mode==='hct'?L().hcWaitOpp:L().rmade);
   }).catch(()=>say(L().fail));
 }
 function hcMkRoom(){
   if(state!=='idle'||lob||honl)return;if(!fbU){say(L().onNeed);return;}
   makeRoom(2,3,'hc');
+}
+function hcMkTeamRoom(){
+  if(state!=='idle'||lob||honl)return;if(!fbU){say(L().onNeed);return;}
+  makeRoom(2,3,'hct');
 }
 function joinRoom(id){
   if(state!=='idle'||lob)return;if(!fbU){say(L().onNeed);return;}
@@ -436,7 +449,8 @@ function openLobby(ref,host){
     Object.keys(prevPl).forEach(u=>{if(!nowPl[u]&&prevPl[u]&&u!==fbU.uid)show(L().leftR(prevPl[u].name));});
     lob.d=d;
     if(d.st==='play'){
-      if(host||d.sel===fbU.uid||d.mode==='team'){ref.off();lob=null;if(d.mode==='hc')startHcOnline(ref,d,host);else startOnline(ref,d,host);}
+      if(host||d.sel===fbU.uid||d.mode==='team'||d.mode==='hct'){ref.off();lob=null;
+        if(d.mode==='hc')startHcOnline(ref,d,host);else if(d.mode==='hct')startHcTeamOnline(ref,d,host);else startOnline(ref,d,host);}
       else{ref.off();lob=null;closeUi();say(L().notPicked);}
       return;}
     ui();});
@@ -491,15 +505,21 @@ function hcWinSound(){
   for(let i=0;i<8;i++)burst(t+Math.random()*.55,.04,{g:.22,fr:2200+Math.random()*1600,q:.9,p:Math.random()*2-1});
   burst(t+.08,.3,{g:.4,fr:500,q:.6});
 }
+let hcBtnsBuilt=false;
+function hcBuildBtns(){
+  if(hcBtnsBuilt)return;hcBtnsBuilt=true;
+  const box=$('hcNums');box.textContent='';
+  for(let n=0;n<=6;n++){const b=document.createElement('button');b.textContent=String(n);
+    b.addEventListener('click',()=>{hcNumSound(n,-0.5);honl?hcOnlineThrow(n):hcThrow(n);});box.appendChild(b);}
+}
 function hcUi(){
   const l=L();if(!$('hcInfo'))return;
-  const active=honl?!honl.pend:HC.on;
+  hcBuildBtns();
+  const active=honl?(!honl.pend&&(!honl.tm||honl.bat||honl.bwl)):HC.on;
+  $('hcNums').hidden=!active;
   $('hcInfo').textContent=honl?(honl.target!==null?(honl.runs+' / '+honl.target):String(honl.runs)):(HC.on?(HC.target!==null?(HC.runs+' / '+HC.target):String(HC.runs)):'');
   $('hgb').hidden=!(HC.on&&!HC.prac&&!honl&&(PROF.gb||0)>0);$('hgbat').hidden=!(HC.on&&!HC.prac&&!honl&&(PROF.gbat||0)>0);
   $('hgb').textContent=l.hcGb+' ('+(PROF.gb||0)+')';$('hgbat').textContent=l.hcGbat+' ('+(PROF.gbat||0)+')';
-  const box=$('hcNums');box.textContent='';
-  if(active){for(let n=0;n<=6;n++){const b=document.createElement('button');b.textContent=String(n);
-    b.addEventListener('click',()=>{hcNumSound(n,-0.5);honl?hcOnlineThrow(n):hcThrow(n);});box.appendChild(b);}}
 }
 function hcStart(prac){
   if(HC.on)return;initAudio();HC.on=true;HC.prac=!!prac;HC.runs=0;
@@ -533,6 +553,7 @@ function startHcOnline(ref,v,host){
 }
 function hcOnlineThrow(n){
   if(!honl||honl.pend||honl.myN!==null)return;
+  if(honl.tm&&!honl.bat&&!honl.bwl)return;
   honl.myN=n;honl.ref.child('hcball/'+honl.round).child(honl.me).set(n).catch(()=>{});
   show(L().hcOppThrow);
 }
@@ -567,6 +588,56 @@ function hcOnAdvance(){
   }
   ui();setTimeout(()=>{if(honl)say(honl.bat?l.hcYourThrow:l.hcOppThrow);},300);
 }
+function startHcTeamOnline(ref,v,host){
+  initAudio();
+  const me=fbU.uid,myTeam=tOf(v,me),win=capOf(v,v.toss)===me;
+  honl={ref,host,win,pend:true,tm:true,me,myTeam,inn:0,bat:false,bwl:false,target:null,runs:0,round:0,lastRound:-1,myN:null,outThis:false,bi:0,
+    T:{A:tList(v,'A'),B:tList(v,'B')},names:Object.keys(v.pl||{}).reduce((o,u)=>{o[u]=v.pl[u].name;return o;},{}),
+    opp:myTeam?(myTeam==='A'?'Team B':'Team A'):'',toss:v.toss,rn:{}};
+  ref.child('hch').on('value',sn=>{const c=sn.val();if(!c||!honl||!honl.pend)return;
+    honl.pend=false;honl.btm=c==='bat'?honl.toss:(honl.toss==='A'?'B':'A');hcTeamSetRoles();
+    const l=L();ui();say((honl.win?l.chose(c==='bat'):l.theyChose(honl.opp,c==='bat'))+' '+hcTeamRoleMsg());});
+  ref.child('hcball').on('value',sn=>{const r=sn.val();if(r)hcTeamResolve(r);});
+  ui();say(honl.win?L().tossWin:L().tossLose(myTeam?(myTeam==='A'?'Team B':'Team A'):''));
+}
+function hcTeamSetRoles(){
+  const bl=honl.T[honl.btm],wl=honl.T[honl.btm==='A'?'B':'A'];
+  honl.curBat=bl[Math.min(honl.bi,bl.length-1)];honl.curBowl=wl[honl.round%wl.length];
+  honl.bat=honl.curBat===honl.me;honl.bwl=honl.curBowl===honl.me;
+}
+function hcTeamRoleMsg(){
+  const l=L(),nm=u=>honl.names[u]||'';
+  return honl.bat?l.hcYourThrowT:honl.bwl?l.hcYourThrowT:l.hcWatching+' '+l.hcBatIs(nm(honl.curBat))+' '+l.hcBowlIs(nm(honl.curBowl));
+}
+function hcTeamResolve(rec){
+  if(!honl)return;const rnd=honl.round,entry=rec[rnd];if(!entry)return;
+  const bu=honl.curBat,wu=honl.curBowl;if(entry[bu]===undefined||entry[wu]===undefined)return;
+  if(rnd<=honl.lastRound)return;honl.lastRound=rnd;
+  const batN=entry[bu],bowlN=entry[wu],out=batN===bowlN,l=L();
+  if(honl.bat||honl.bwl){hcNumSound(batN,-0.5);setTimeout(()=>hcNumSound(bowlN,0.5),120);}
+  if(out){hcOutSound();honl.rn[bu]=honl.rn[bu]||0;honl.bi++;say(l.hcOnOut(batN,bowlN));hcTeamAdvance(true);return;}
+  honl.runs+=batN;honl.rn[bu]=(honl.rn[bu]||0)+batN;
+  say(l.hcOnRun(batN,bowlN));hcTeamAdvance(false);
+}
+function hcTeamAdvance(outNow){
+  honl.round++;honl.myN=null;
+  const bl=honl.T[honl.btm],allOut=honl.bi>=bl.length,wonChase=honl.target!==null&&honl.runs>=honl.target;
+  if(allOut||wonChase){
+    if(honl.inn===0){const sc=honl.runs;honl.inn=1;honl.bi=0;honl.btm=honl.btm==='A'?'B':'A';honl.runs=0;honl.target=sc+1;honl.round=0;honl.lastRound=-1;
+      hcTeamSetRoles();ui();setTimeout(()=>{if(honl)say(L().hcInnEnd(sc,sc+1)+' '+hcTeamRoleMsg());},400);return;}
+    const battingWon=wonChase,winTeam=battingWon?honl.btm:(honl.btm==='A'?'B':'A'),finalWin=honl.myTeam===winTeam;
+    PROF.m++;if(finalWin)PROF.w++;else PROF.l++;
+    PROF.hcM=(PROF.hcM||0)+1;if(finalWin)PROF.hcW=(PROF.hcW||0)+1;else PROF.hcL=(PROF.hcL||0)+1;
+    const top=Object.keys(honl.rn).sort((a,b)=>honl.rn[b]-honl.rn[a])[0],l=L();
+    let momTxt='';if(top===honl.me){PROF.gb=(PROF.gb||0)+2;PROF.gbat=(PROF.gbat||0)+2;momTxt=' '+l.hcMom(PROF.name);}
+    saveP();const h=honl.host,teamWord=winTeam==='A'?l.tmN[0]:l.tmN[1];
+    try{honl.ref.child('hch').off();honl.ref.child('hcball').off();if(h)honl.ref.remove();}catch(e){}
+    honl=null;state='idle';page='home';ui();cheer(finalWin);
+    setTimeout(()=>say(l.teamWon(teamWord)+momTxt),300);
+    return;
+  }
+  hcTeamSetRoles();ui();setTimeout(()=>{if(honl)say(hcTeamRoleMsg());},300);
+}
 function hcUseGb(){
   if(!HC.on||HC.prac||!(PROF.gb>0))return;PROF.gb--;saveP();
   const n=Math.floor(Math.random()*7);hcNumSound(n,0.5);hcOutSound();HC.on=false;say(L().hcGbUse(n)+' '+L().hcLose(HC.runs,HC.target||0));PROF.hcM=(PROF.hcM||0)+1;PROF.hcL=(PROF.hcL||0)+1;saveP();hcUi();
@@ -578,13 +649,17 @@ function hcUseGbat(){
   if(HC.target!==null&&HC.runs>=HC.target){HC.on=false;hcWinSound();say(L().hcWin(HC.runs));PROF.hcM=(PROF.hcM||0)+1;PROF.hcW=(PROF.hcW||0)+1;saveP();}
 }
 function renderRooms(all){
-  const l=L(),tm=page==='team',hc=page==='hcon',want=tm?'team':(hc?'hc':''),box=$(tm?'tlist':hc?'hrlist':'rlist');box.textContent='';let n=0;
+  const l=L(),tm=page==='team',hc=page==='hcon',box=$(tm?'tlist':hc?'hrlist':'rlist');box.textContent='';let n=0;
   Object.keys(all).forEach(id=>{const r=all[id];
-    if(!r||r.st!=='lobby'||!r.host||(r.mode||'')!==want||Date.now()-r.t>7200000)return;
-    if(hc&&Object.keys(r.pl||{}).filter(u=>(r.pl||{})[u]&&u!==r.host.uid).length>0)return;
+    if(!r||r.st!=='lobby'||!r.host||Date.now()-r.t>7200000)return;
+    const rm=r.mode||'';
+    if(tm&&rm!=='team')return;
+    if(!tm&&!hc&&rm!=='')return;
+    if(hc&&rm!=='hc'&&rm!=='hct')return;
+    if(rm==='hc'&&Object.keys(r.pl||{}).filter(u=>(r.pl||{})[u]&&u!==r.host.uid).length>0)return;
     n++;
     const c=Object.keys(r.pl||{}).filter(u=>(r.pl||{})[u]).length,b=document.createElement('button');
-    b.textContent=tm?l.teamBtn(r.host.name,r.ov,c):hc?l.hcRoomBtn(r.host.name,c):l.roomBtn(r.host.name,r.ov,r.wk,c);
+    b.textContent=tm?l.teamBtn(r.host.name,r.ov,c):rm==='hct'?l.hcTeamRoomBtn(r.host.name,c):hc?l.hcRoomBtn(r.host.name,c):l.roomBtn(r.host.name,r.ov,r.wk,c);
     b.onclick=()=>joinRoom(id);box.appendChild(b);});
   if(!n){const p=document.createElement('p');p.textContent=l.noRooms;box.appendChild(p);}
 }
@@ -598,7 +673,7 @@ function lobRow(box,u,nm,h){
 }
 function lobHead(box,txt){const h=document.createElement('p');h.textContent=txt;h.style&&(h.style.fontWeight='700');box.appendChild(h);}
 function renderLobby(){
-  if(!lob||!lob.d)return;const d=lob.d,l=L(),pl=d.pl||{},ids=Object.keys(pl).filter(u=>pl[u]).sort((a,b)=>pl[a].t-pl[b].t),h=lob.host,box=$('plist'),tm=d.mode==='team';
+  if(!lob||!lob.d)return;const d=lob.d,l=L(),pl=d.pl||{},ids=Object.keys(pl).filter(u=>pl[u]).sort((a,b)=>pl[a].t-pl[b].t),h=lob.host,box=$('plist'),tm=(d.mode==='team'||d.mode==='hct');
   const sig=JSON.stringify([d,h,lg]);if(lob.sig===sig)return;lob.sig=sig;
   $('lobT').textContent=h?l.lobMine:l.lobJoined(d.host.name);
   box.textContent='';
@@ -613,7 +688,7 @@ function renderLobby(){
     if(!wait.length){const p=document.createElement('p');p.textContent=l.hdNoneTeam;box.appendChild(p);}
     wait.forEach(u=>lobRow(box,u,pl[u].name,h));
   }else{
-    $('lobInfo').textContent=l.lobInfo(d.ov,d.wk,ids.length,null);
+    $('lobInfo').textContent=(d.mode==='hc')?l.hcLobInfo(ids.length):l.lobInfo(d.ov,d.wk,ids.length,null);
     lobHead(box,l.hdSel+':');
     if(d.sel&&pl[d.sel])lobRow(box,d.sel,pl[d.sel].name+' ('+l.selected+')',h);
     else{const p=document.createElement('p');p.textContent=l.hdNone;box.appendChild(p);}
@@ -625,7 +700,7 @@ function renderLobby(){
   $('stg').hidden=!(h&&(tm?(tList(d,'A').length&&tList(d,'B').length):(d.sel&&pl[d.sel])));$('lcn').textContent=h?l.lcn:l.leave;
 }
 function openPd(u,nm){
-  if(!lob||!lob.d)return;pdU=u;const d=lob.d,l=L(),tm=d.mode==='team',t=tOf(d,u),sel=d.sel===u;
+  if(!lob||!lob.d)return;pdU=u;const d=lob.d,l=L(),tm=(d.mode==='team'||d.mode==='hct'),t=tOf(d,u),sel=d.sel===u;
   $('pdT').textContent=nm;
   $('pdSel').hidden=tm||sel;$('pdWait').hidden=tm?!t:!sel;
   $('pdA').hidden=!tm||t==='A';$('pdB').hidden=!tm||t==='B';$('pdCap').hidden=!tm||!t||capOf(d,t)===u;
@@ -941,8 +1016,9 @@ $('tut').addEventListener('click',()=>{if(onl||state==='bowl'||state==='wait')re
 $('shr').addEventListener('click',()=>{const t=L().shT(lastRes||L().pst(PROF));if(navigator.share)navigator.share({text:t}).catch(()=>{});else try{navigator.clipboard.writeText(t).then(()=>say(L().copied));}catch(e){}});
 $('btb').addEventListener('click',()=>{if(state!=='idle')return;CFG.bt=(CFG.bt+1)%4;saveC();ui();show(L().bt+': '+L().btl[CFG.bt]);});
 $('rpt').addEventListener('click',()=>{if(tts)say(lastT);else{$('status').textContent='';setTimeout(()=>{$('status').textContent=lastT;},80);}});
-$('mkr').addEventListener('click',()=>mkRoom(''));$('mkt').addEventListener('click',()=>mkRoom('team'));$('hcmkr').addEventListener('click',hcMkRoom);
-const go=p=>{page=p;watchRooms(p==='on'||p==='team'||p==='hcon');ui();};
+$('mkr').addEventListener('click',()=>mkRoom(''));$('mkt').addEventListener('click',()=>mkRoom('team'));$('hcmkr').addEventListener('click',hcMkRoom);$('hcmkt').addEventListener('click',hcMkTeamRoom);
+const go=p=>{page=p;watchRooms(p==='on'||p==='team'||p==='hcon');ui();
+  if(['on','team','hcon'].includes(p)&&!fbU)say(L().onNeed);};
 [['hmP','prof'],['hmS','set'],['hmN','off'],['hmO','on'],['hmT','team'],['hmSc','score'],['hmH','hand'],['hmHO','hcon'],['hmR','rul']].forEach(([id,p])=>$(id).addEventListener('click',()=>go(p)));
 document.querySelectorAll('.bk').forEach(b=>b.addEventListener('click',()=>go('home')));
 $('msgb').addEventListener('click',()=>{const l=L(),b=$('presets');b.textContent='';
@@ -981,7 +1057,7 @@ $('pdB').addEventListener('click',()=>pdDo((r,u)=>r.child('tm/'+u).set('B')));
 $('pdCap').addEventListener('click',()=>pdDo((r,u)=>r.child('cap/'+tOf(lob.d,u)).set(u)));
 $('pdRem').addEventListener('click',()=>pdDo((r,u)=>{const a=[r.child('pl/'+u).remove(),r.child('tm/'+u).remove()];if(lob.d.sel===u)a.push(r.child('sel').remove());return Promise.all(a);}));
 $('pdCl').addEventListener('click',()=>{const d=$('pdlg');if(d.close)d.close();});
-$('stg').addEventListener('click',()=>{if(!lob||!lob.host||!lob.d)return;const d=lob.d,tm=d.mode==='team';
+$('stg').addEventListener('click',()=>{if(!lob||!lob.host||!lob.d)return;const d=lob.d,tm=(d.mode==='team'||d.mode==='hct');
   if(tm?(tList(d,'A').length&&tList(d,'B').length):d.sel)lob.ref.update({st:'play',toss:tm?(Math.random()<.5?'A':'B'):(Math.random()<.5?'host':'guest'),t0:Date.now()});});
 $('hcStart').addEventListener('click',()=>hcStart(false));
 $('hcPrac').addEventListener('click',()=>hcStart(true));
